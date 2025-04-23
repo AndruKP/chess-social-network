@@ -7,6 +7,13 @@
 ```
 wget https://database.lichess.org/standard/lichess_db_standard_rated_2013-01.pgn.zst
 unzstd lichess_db_standard_rated_2013-01.pgn.zst
+
+# resp. wget https://database.lichess.org/standard/lichess_db_standard_rated_2016-01.pgn.zst
+# unzstd lichess_db_standard_rated_2016-01.pgn.zst
+```
+
+```
+python scripts/pgn_to_csv.py lichess_db_standard_rated_2016-01.pgn lichess_db_standard_rated_2016-01.csv
 ```
 
 ### Environment preparation
@@ -16,5 +23,5 @@ For now my (Denys) choice is to use graph-tool as the fastest method (maybe rust
 
 ```
 mamba create -n scinet
-mamba install networkx python-igraph numpy pandas matplotlib graph-tool 
+mamba install networkx python-igraph graph-tool numpy pandas matplotlib
 ```
