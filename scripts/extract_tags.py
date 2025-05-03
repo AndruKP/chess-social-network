@@ -1,35 +1,32 @@
 import argparse
-import csv
 
 def preprocess(string:str):
     string = string.strip()
     return string[string.find('[') + 1:string.find(' ')]
-    # return string[:string.find('"') + 1]
 
 
 parser = argparse.ArgumentParser(description='''
-Program for converting pgn files into csv with only relevant information.
-                                 
-Data format: 
-Event,Site,White,Black,Result,UTCDate,UTCTime,WhiteElo,BlackElo,WhiteRatingDiff,BlackRatingDiff,ECO,Opening,TimeControl,Termination
+Program for extracting all possible tags from pgn files
 ''')
 
 parser.add_argument('input', help='Name of a file to open')
-parser.add_argument('output', help='Name of csv output')
+parser.add_argument('output', help='Name of output file')
 
 args = parser.parse_args()
 
-with open(args.output, 'w') as fo:
-    writer = csv.writer(fo)
-    with open(args.input) as fi:
-        while True:
-            row = []
-            while (line:=fi.readline()).strip() != '':
-                print(preprocess(line),file=fo)
+tags = set()
 
-            if len(row) == 0:
-                break
-            
-            writer.writerow(row)
-            game = fi.readline()
-            empty = fi.readline()
+with open(args.input) as fi:
+    while True:
+        while (line:=fi.readline()).strip() != '':
+            tags.add(preprocess(line))
+        
+        fi.readline()
+        fi.readline()
+
+        if line == '':
+            break
+
+with open(args.output, 'w') as fo:
+    for elem in tags:
+        print(f'"{elem}",', file=fo)
