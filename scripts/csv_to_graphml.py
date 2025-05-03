@@ -4,7 +4,7 @@ import argparse
 
 def csv_to_graphml(csv_file, graphml_file):
     """
-    Converts a CSV file to GraphML format without using external libraries like networkx.
+    Converts a CSV file to GraphML format
 
     Args:
         csv_file (str): Path to the input CSV file.
