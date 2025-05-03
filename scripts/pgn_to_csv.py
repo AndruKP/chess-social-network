@@ -12,20 +12,20 @@ def preprocess(string:str):
     # return string[:string.find('"') + 1]
 
 FIELDNAMES = [
+    "White",
     "Black",
+    "Result",
     "BlackElo",
     "BlackRatingDiff",
     "BlackTitle",
     "ECO",
     "Event",
     "Opening",
-    "Result",
     "Site",
     "Termination",
     "TimeControl",
     "UTCDate",
     "UTCTime",
-    "White",
     "WhiteElo",
     "WhiteRatingDiff",
     "WhiteTitle"
@@ -35,7 +35,7 @@ parser = argparse.ArgumentParser(description='''
 Program for converting pgn files into csv with only relevant information.
                                  
 Data format: 
-Event,Site,White,Black,Result,UTCDate,UTCTime,WhiteElo,BlackElo,WhiteRatingDiff,BlackRatingDiff,ECO,Opening,TimeControl,Termination
+    "White","Black","Result","BlackElo","BlackRatingDiff","BlackTitle","ECO","Event","Opening","Site","Termination","TimeControl","UTCDate","UTCTime","WhiteElo","WhiteRatingDiff","WhiteTitle"
 ''')
 
 parser.add_argument('input', help='Name of a file to open')
