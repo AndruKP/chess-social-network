@@ -1,33 +1,11 @@
 import argparse
 import csv
 
-def tag(string:str):
+def preprocess(string:str):
     string = string.strip()
     return string[string.find('[') + 1:string.find(' ')]
     # return string[:string.find('"') + 1]
 
-def preprocess(string:str):
-    string = string.strip()
-    return string[string.find('"') + 1:string.rfind('"')]
-    # return string[:string.find('"') + 1]
-
-FIELDNAMES = [
-    "Black",
-    "BlackElo",
-    "BlackRatingDiff",
-    "ECO",
-    "Event",
-    "Opening",
-    "Result",
-    "Site",
-    "Termination",
-    "TimeControl",
-    "UTCDate",
-    "UTCTime",
-    "White",
-    "WhiteElo",
-    'WhiteRatingDiff'
-] 
 
 parser = argparse.ArgumentParser(description='''
 Program for converting pgn files into csv with only relevant information.
@@ -42,12 +20,12 @@ parser.add_argument('output', help='Name of csv output')
 args = parser.parse_args()
 
 with open(args.output, 'w') as fo:
-    writer = csv.DictWriter(fo, fieldnames = FIELDNAMES)
+    writer = csv.writer(fo)
     with open(args.input) as fi:
         while True:
-            row = {}
+            row = []
             while (line:=fi.readline()).strip() != '':
-                row[tag(line)] = preprocess(line)
+                print(preprocess(line),file=fo)
 
             if len(row) == 0:
                 break
@@ -55,5 +33,3 @@ with open(args.output, 'w') as fo:
             writer.writerow(row)
             game = fi.readline()
             empty = fi.readline()
-
-    
