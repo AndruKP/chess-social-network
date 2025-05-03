@@ -15,6 +15,7 @@ FIELDNAMES = [
     "Black",
     "BlackElo",
     "BlackRatingDiff",
+    "BlackTitle",
     "ECO",
     "Event",
     "Opening",
@@ -26,7 +27,8 @@ FIELDNAMES = [
     "UTCTime",
     "White",
     "WhiteElo",
-    'WhiteRatingDiff'
+    "WhiteRatingDiff",
+    "WhiteTitle"
 ] 
 
 parser = argparse.ArgumentParser(description='''
@@ -42,7 +44,7 @@ parser.add_argument('output', help='Name of csv output')
 args = parser.parse_args()
 
 with open(args.output, 'w') as fo:
-    writer = csv.DictWriter(fo, fieldnames = FIELDNAMES)
+    writer = csv.DictWriter(fo, fieldnames = FIELDNAMES, restval = 'None', delimiter = ';')
     with open(args.input) as fi:
         while True:
             row = {}

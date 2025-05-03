@@ -29,6 +29,7 @@ mamba install networkx python-igraph graph-tool numpy pandas matplotlib
 ## Night 24/25.04.2025 (Denys)
 Just for fun: 
 ```
+perl -F";" -lane 'print $F[9]' test.csv | sort | uniq > term.txt
 perl -F, -lane 'print $F[2]' data/lichess_db_standard_rated_2016-01.csv > whites.txt
 perl -F, -lane 'print $F[3]' data/lichess_db_standard_rated_2016-01.csv > blacks.txt
 
