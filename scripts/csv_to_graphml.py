@@ -2,7 +2,7 @@ import csv
 import xml.etree.ElementTree as ET
 import argparse
 
-def csv_to_graphml_w2b(csv_file, graphml_file, graph_type):
+def csv_to_graphml(csv_file, graphml_file, graph_type):
     """
     Converts a CSV file to GraphML format
 
@@ -22,7 +22,7 @@ def csv_to_graphml_w2b(csv_file, graphml_file, graph_type):
     # Read the CSV file
     with open(csv_file, 'r') as file:
         reader = csv.reader(file, delimiter=';')
-        headers = next(reader)  # Assume the first row contains headers
+        # headers = next(reader)  # Assume the first row contains headers
 
         # Keep track of nodes to avoid duplicates
         nodes = set()
@@ -44,14 +44,20 @@ def csv_to_graphml_w2b(csv_file, graphml_file, graph_type):
                 ET.SubElement(graph, "node", id=black)
                 nodes.add(black)
 
-            if graph_type == "white_to_black":
-                # Add edge with attributes
+            if graph_type == "white_to_black":             
                 edge = ET.SubElement(graph, "edge", source=white, target=black)
-                # for i, attr in enumerate(attributes):
-                #     ET.SubElement(edge, f"data", key=f"attr{i}").text = attr
+                
             elif graph_type == "winner_to_loser":
-                ...
-            
+                if result == '1-0':
+                    edge = ET.SubElement(graph, "edge", source=white, target=black)
+                elif result == '0-1':
+                    edge = ET.SubElement(graph, "edge", source=black, target=white)
+                else:
+                    edge = ET.SubElement(graph, "edge", source=white, target=black, directed='false')
+
+            # Add edge with attributes
+            # for i, attr in enumerate(attributes):
+                #     ET.SubElement(edge, f"data", key=f"attr{i}").text = attr
 
     # Write the GraphML to a file
     tree = ET.ElementTree(graphml)
@@ -68,4 +74,4 @@ parser.add_argument("graph_type", choices=['white_to_black', 'winner_to_loser'],
 args = parser.parse_args()
 
 # Call the conversion function
-csv_to_graphml_w2b(args.csv_file, args.graphml_file, args.graph_type)
+csv_to_graphml(args.csv_file, args.graphml_file, args.graph_type)
