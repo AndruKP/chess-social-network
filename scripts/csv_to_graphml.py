@@ -2,6 +2,26 @@ import csv
 import xml.etree.ElementTree as ET
 import argparse
 
+FIELDNAMES = [
+    "White", #0
+    "Black", #1
+    "Result", #2
+    "BlackElo", #3
+    "BlackRatingDiff", #4
+    "BlackTitle", #5
+    "ECO", #6
+    "Event", #7
+    "Opening", #8
+    "Site", #9
+    "Termination", #10
+    "TimeControl", #11
+    "UTCDate", #12
+    "UTCTime", #13
+    "WhiteElo", #14
+    "WhiteRatingDiff", #15
+    "WhiteTitle" #16
+]
+
 def csv_to_graphml(csv_file, graphml_file, graph_type):
     """
     Converts a CSV file to GraphML format
@@ -18,6 +38,14 @@ def csv_to_graphml(csv_file, graphml_file, graph_type):
     # Create the root element for GraphML
     graphml = ET.Element("graphml", xmlns="http://graphml.graphdrawing.org/xmlns")
     graph = ET.SubElement(graphml, "graph", edgedefault="directed")
+    
+    ET.SubElement(graph, "key", id="id", **{
+        "for": "edge", "attr.name": "id", "attr.type": "int"
+    })
+    
+    ET.SubElement(graph, "key", id="gt", **{
+        "for": "edge", "attr.name": "game type", "attr.type": "string"
+    })
 
     # Read the CSV file
     with open(csv_file, 'r') as file:
@@ -26,7 +54,9 @@ def csv_to_graphml(csv_file, graphml_file, graph_type):
 
         # Keep track of nodes to avoid duplicates
         nodes = set()
-
+        
+        id_counter = 0
+        
         # Add edges and nodes
         for row in reader:
             # FIXME: Adjust the indices based on your CSV structure
@@ -56,8 +86,15 @@ def csv_to_graphml(csv_file, graphml_file, graph_type):
                     edge = ET.SubElement(graph, "edge", source=white, target=black, directed='false')
 
             # Add edge with attributes
-            # for i, attr in enumerate(attributes):
-                #     ET.SubElement(edge, f"data", key=f"attr{i}").text = attr
+            game_type = ""
+            if "Bullet" in attributes[4] : game_type = 'B'
+            if "Blitz" in attributes[4] : game_type = 'Z'
+            if "Classical" in attributes[4] : game_type = 'C'
+
+            ET.SubElement(edge, f"data", key=f"id").text = str(id_counter)
+            ET.SubElement(edge, f"data", key=f"gt").text = game_type
+            
+            id_counter += 1
 
     # Write the GraphML to a file
     tree = ET.ElementTree(graphml)
