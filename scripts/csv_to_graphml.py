@@ -90,6 +90,7 @@ def csv_to_graphml(csv_file, graphml_file, graph_type):
             if "Bullet" in attributes[4] : game_type = 'B'
             if "Blitz" in attributes[4] : game_type = 'Z'
             if "Classical" in attributes[4] : game_type = 'C'
+            if "Correspondence" in attributes[4] : game_type = 'N'
 
             ET.SubElement(edge, f"data", key=f"id").text = str(id_counter)
             ET.SubElement(edge, f"data", key=f"gt").text = game_type
