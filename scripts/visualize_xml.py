@@ -24,14 +24,15 @@ dprms = dict(#fmt="png",
              output=args.output_file)
 
 # gt.graph_draw(g, pos, **dprms)
-# st = gt.BlockState(g, B=3)
 
 
 #good for 2013
-# state = gt.minimize_blockmodel_dl(g,
-#                                    state_args={'B':4},
-#                                      multilevel_mcmc_args=dict(B_max=5)
-#                                      )
+print('minimizing blockmodel description length')
+state = gt.minimize_blockmodel_dl(g,
+                                    state_args={'B':4},
+                                    multilevel_mcmc_args=dict(B_max=4, niter=1)
+                                    )
+print('finished minimizing blockmodel description length')
 
 type_to_color = {
     'C':'red', #Classic 
@@ -44,10 +45,8 @@ edge_type = g.edge_properties['game type']
 
 edge_color = g.new_edge_property("string")
 for e in tqdm(g.edges(), 'Edges colors'):
-    try:
-        edge_color[e] = type_to_color[edge_type[e]]
-    except:
-        print(e)
+    edge_color[e] = type_to_color[edge_type[e]]
+    
 
 
 
@@ -61,13 +60,20 @@ for e in tqdm(g.edges(), 'Edges colors'):
 
 
 #good for 2013
-# pos2 = gt.sfdp_layout(g, groups=state.b, gamma=.02) 
+print('calculating layout')
+pos2 = gt.sfdp_layout(g,
+                       groups=state.b,
+                         gamma=.02) 
+print('layout is calculated')
+
+g.vp['pos'] = pos2
+g.save(args.graphml_file.replace('xml','gt'))
 # state.draw(pos=pos2, **dprms,  edge_color=edge_color,ecmap=False,
 #             #          vertex_fill_color=gt.prop_to_size(vb, 0, 1, power=.1),
 #             # vertex_size=gt.prop_to_size(vb, 3, 12, power=.2), vorder=vb,
 #             )
-pos2 = gt.random_layout(g)
-print('pos is ready')
+# pos2 = gt.random_layout(g)
+print('drawing started')
 gt.graph_draw(g,
            pos=pos2,
            edge_color=edge_color,
@@ -76,6 +82,7 @@ gt.graph_draw(g,
         #    vertex_size=gt.prop_to_size(vb, 3, 12, power=.2),
            **dprms
 )
+print('drawing finished')
 
 
 # state.draw(**dprms)

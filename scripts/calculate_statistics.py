@@ -39,7 +39,7 @@ with open(f'{args.output_directory}/log.txt', 'w') as f:
     print(f'starting time: {datetime.time()}',file=f)
     print('==========================',file=f)
     print(f'Number of vertices: {g.num_vertices()}', file=f)
-    print(f'Number of edges: {g.num_vertices()}', file=f)
+    print(f'Number of edges: {g.num_edges()}', file=f)
     print(f'Min degree: {min_degree}', file=f)
     print(f'Max degree: {max_degree}', file=f)
     print(f'Mean degree: {mean_degree}', file=f)
