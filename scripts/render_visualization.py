@@ -16,14 +16,9 @@ def parse_resolution(res_str):
 
 parser = argparse.ArgumentParser(description="Render a graph visualization of a graph in gt format.\
 Note that you need to calculate and store in gt file graph layout.")
-parser.add_argument("gt_file", help="Path to the input GraphML file")
-parser.add_argument("output_file", help="Path to the output gt file")
-parser.add_argument(
-    '--resolution',
-    type=parse_resolution,
-    default="2000x2000",
-    help='Resolution in WIDTHxHEIGHT format, e.g., 1920x1080'
-)
+parser.add_argument("gt_file", help="Path to the input gt file")
+parser.add_argument("output_file", help="Path to the output (e.g. png) file")
+parser.add_argument('--resolution', type=parse_resolution, default="2000x2000", help='Resolution in WIDTHxHEIGHT format, e.g., 1920x1080')
 
 args = parser.parse_args()
 width, height = args.resolution
@@ -55,8 +50,8 @@ gt.graph_draw(g,
            pos=g.vp.pos,
            edge_color=edge_color,
            edge_pen_width=0.2,
-        #    vertex_fill_color=state.b,
-        vertex_size=gt.prop_to_size(g.degree_property_map('total'), 3, 12, power=.2),
+        #    vertex_fill_color=g.vp.block,
+        vertex_size=gt.prop_to_size(g.degree_property_map('total'), 0.3, 1.2, power=.2),
            **dprms
 )
 print('drawing finished')
