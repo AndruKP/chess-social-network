@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import argparse
 import os
 import datetime
+import numpy as np
+from scipy.stats import t
 
 parser = argparse.ArgumentParser(description="Create a statistics log of a graph in GraphML format.")
 parser.add_argument("graphml_file", help="Path to the input GraphML file")
@@ -156,3 +158,101 @@ ax.grid()
 fig.savefig(f'{args.output_directory}/pagerank_centrality_distribution.png')
 plt.close(fig)
 
+def power_law_linreg(vals, counts):
+    # Gets an array of points, filters empty bins out
+    # Then returns a power-law curve to approximate the distribution
+    fvals = vals[counts > 0]
+    fcounts = counts[counts > 0]
+    lvals = np.log(fvals)
+    lcounts = np.log(fcounts)
+
+    # Perform linear regression
+    a, b = np.polyfit(lvals, lcounts, deg=1, w=fcounts)  # a is the slope, b is the intercept
+
+    # Calculate residuals
+    predicted = a * lvals + b
+    residuals = lcounts - predicted
+
+    # Calculate standard error of the slope
+    n = len(lvals)  # Number of data points
+    variance = np.sum(residuals**2) / (n - 2)  # Variance of residuals
+    x_variance = np.sum((lvals - np.mean(lvals))**2)  # Variance of x (log values)
+    slope_std_error = np.sqrt(variance / x_variance)  # Standard error of the slope
+
+    # Calculate t-statistic for the slope
+    t_stat = a / slope_std_error
+
+    # Calculate p-value (two-tailed)
+    p_value = 2 * (1 - t.cdf(abs(t_stat), df=n - 2))
+
+    # Return slope, intercept, and p-value
+    return (np.exp(b), a, p_value)
+
+
+def do_plot(values, ax, color='blue'):
+    filtered_vals = values[values > 0]
+    #evenly spaced out bins on logarithmic scale
+    bin_locs = np.logspace(np.log10(min(filtered_vals)),np.log10(max(filtered_vals)), num=50)
+    #the histogram returns the counts in every bin
+    hist_result = ax.hist(values, bins=bin_locs, color=color, alpha=0.7)
+    counts = hist_result[0]
+    #draw the power law curve
+    coef1, coef2, pvalue = power_law_linreg(bin_locs[:-1], counts)
+    coef = (coef1, coef2)
+
+    ax.plot(bin_locs, coef[0] * bin_locs ** coef[1], 'r')
+    print(pvalue)
+    return pvalue
+
+
+# Plot degree distribution
+degree_distribution = g.degree_property_map("total")
+fig, ax = plt.subplots(figsize=(10, 6))
+p = do_plot(degree_distribution.a, ax, color='blue')
+ax.set_title(f'Degree Distribution pvalue = {p}')
+ax.set_xlabel('Degree')
+ax.set_ylabel('Frequency')
+ax.grid()
+ax.set_xscale('log')
+ax.set_yscale('log')
+fig.savefig(f'{args.output_directory}/degree_distribution_loglog.png')
+plt.close(fig)
+
+# Plot indegree distribution
+indegree_distribution = g.degree_property_map("in")
+fig, ax = plt.subplots(figsize=(10, 6))
+do_plot(indegree_distribution.a, ax, color='green')
+ax.set_title(f'Indegree Distribution')
+ax.set_xlabel('Indegree')
+ax.set_ylabel('Frequency')
+ax.grid()
+ax.set_xscale('log')
+ax.set_yscale('log')
+fig.savefig(f'{args.output_directory}/indegree_distribution_loglog.png')
+plt.close(fig)
+
+# Plot outdegree distribution
+outdegree_distribution = g.degree_property_map("out")
+fig, ax = plt.subplots(figsize=(10, 6))
+do_plot(outdegree_distribution.a, ax, color='red')
+ax.set_title(f'Outdegree Distribution')
+ax.set_xlabel('Outdegree')
+ax.set_ylabel('Frequency')
+ax.grid()
+ax.set_xscale('log')
+ax.set_yscale('log')
+fig.savefig(f'{args.output_directory}/outdegree_distribution_loglog.png')
+plt.close(fig)
+
+# Plot PageRank centrality distribution
+pagerank_centrality = gt.pagerank(g)
+fig, ax = plt.subplots(figsize=(10, 6))
+do_plot(pagerank_centrality.a, ax, color='pink')
+ax.set_title(f'PageRank Centrality Distribution')
+ax.set_xlabel('PageRank Centrality')
+ax.set_ylabel('Frequency')
+ax.grid()
+ax.set_xscale('log')
+ax.set_yscale('log')
+fig.savefig(f'{args.output_directory}/pagerank_centrality_distribution_loglog.png')
+plt.close(fig)
