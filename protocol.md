@@ -61,3 +61,17 @@ The first runs in `~45 s`.
 The second runs in `~15 m`.
 
 Conclusion: TODO: rewrite visualize_xml.py into 2 several files: we can save in gt format position of vertices, so there will be no need to recalculate this funny positions over and over again (pretty complex for computer...)
+
+## 05.05.2025
+`scripts/csv_to_graphml.py` is ready (Denys & Skalos).
+`scripts/calculate_statistics.py` is created (Denys).
+
+## 07.05.2025 
+maybe will be usefull
+```
+# state.draw(pos=pos2, **dprms,  edge_color=edge_color,ecmap=False,
+#             #          vertex_fill_color=gt.prop_to_size(vb, 0, 1, power=.1),
+#             # vertex_size=gt.prop_to_size(vb, 3, 12, power=.2), vorder=vb,
+#             )
+# pos2 = gt.random_layout(g)
+```

@@ -6,6 +6,7 @@ import datetime
 import numpy as np
 from scipy.stats import t
 
+
 parser = argparse.ArgumentParser(description="Create a statistics log of a graph in GraphML format.")
 parser.add_argument("graphml_file", help="Path to the input GraphML file")
 parser.add_argument("output_directory", help="Path to the output directory, where report will be created")
@@ -33,8 +34,34 @@ mean_degree = 2 * g.num_edges() / g.num_vertices()
 mean_indegree = g.num_edges() / g.num_vertices()
 density = mean_degree / (g.num_vertices() - 1)
 
+median_degree = np.median(degrees)
+median_indegree = np.median(indegree)
+median_outdegree = np.median(outdegree)
+
 global_clustering_coefficient = gt.global_clustering(g)
 reciprocity = gt.edge_reciprocity(g)
+
+print('extracting the largest component')
+ge = gt.extract_largest_component(g, directed=False)
+print('The largest component is extracted')
+
+#good for 2013
+print('minimizing blockmodel description length')    
+state = gt.minimize_blockmodel_dl(ge,
+                                    state_args={'B':4},
+                                    multilevel_mcmc_args=dict(B_max=4, niter=1)
+                                    )
+print('finished minimizing blockmodel description length')
+
+
+print('calculating layout')
+pos2 = gt.sfdp_layout(ge, groups=state.b, gamma=.02) 
+ge.vp['block'] = state.get_blocks()
+print('layout is calculated')
+
+block_assortativity = gt.assortativity(ge, ge.vp['block'])
+
+degree_assortativity = gt.scalar_assortativity(g, "total")
 
 with open(f'{args.output_directory}/log.txt', 'w') as f:
     print(f'Graph located at: {args.graphml_file}',file=f)
@@ -45,14 +72,19 @@ with open(f'{args.output_directory}/log.txt', 'w') as f:
     print(f'Min degree: {min_degree}', file=f)
     print(f'Max degree: {max_degree}', file=f)
     print(f'Mean degree: {mean_degree}', file=f)
+    print(f'Median degree: {median_degree}', file=f)
     print(f'Min indegree: {min_indegree}', file=f)
     print(f'Max indegree: {max_indegree}', file=f)
     print(f'Min outdegree: {min_outdegree}', file=f)
     print(f'Max outdegree: {max_outdegree}', file=f)
     print(f'Mean indegree = Mean outdegree: {mean_indegree}', file=f)
+    print(f'Median indegree: {median_indegree}', file=f)
+    print(f'Median outdegree: {median_outdegree}', file=f)
     print(f'Density: {density}', file=f)
     print(f'Global clustering coefficient: {global_clustering_coefficient}', file=f)
     print(f'Reciprocity: {reciprocity}', file=f)
+    print(f"Assortativity by communities (blocks): {block_assortativity[0]} ± {block_assortativity[1]}", file=f)
+    print(f"Assortativity by vertice degrees: {degree_assortativity[0]} ± {degree_assortativity[1]}", file=f)
     print('==========================', file=f)
     print(f'ending time: {datetime.time()}',file=f)
 
